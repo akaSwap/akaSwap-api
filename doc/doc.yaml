@@ -1,0 +1,879 @@
+openapi: '3.0.2'
+info:
+  title: akaSwap api
+  version: 'preview'
+
+servers:
+  - url: https://akaswap.com/api
+
+tags:
+  - name: akaOBJ
+    description: Everything about akaOBJ
+  - name: account
+    description: Everything about account
+  - name: auction
+    description: Everything about auction
+  - name: bundle
+    description: Everything about bundle
+  - name: gacha
+    description: Everything about gacha
+  - name: tag
+    description: Everything about tag
+
+components:
+  schemas:
+    tokenInfo:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        frameColor:
+          nullable: true
+          type: string
+        symbol:
+          type: string
+        artifactUri:
+          type: string
+        displayUri:
+          type: string
+        thumbnailUri:
+          type: string
+        creators:
+          type: array
+          items:
+            type: string
+        aliases:
+          type: array
+          items:
+            type: string
+        formats:
+          type: array
+          items:
+            type: object
+            properties:
+              uri:
+                type: string
+              mimeType:
+                type: string
+        decimals:
+          type: integer
+        isBooleanAmount:
+          type: boolean
+        shouldPreferSymbol:
+          type: boolean
+        creatorShares:
+          type: array
+          items:
+            type: integer
+    metadata:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        symbol:
+          type: string
+        creators:
+          type: array
+          items:
+            type: string
+        decimals:
+          type: integer
+        isBooleanAmount:
+          type: boolean
+        shouldPreferSymbol:
+          type: boolean
+        id:
+          type: integer
+    akaOBJ:
+      type: object
+      properties:
+        tokenId:
+          type: integer
+        ipfsHash:
+          type: string
+        sales:
+          nullable: true
+          type: object
+          properties:
+            swaps:
+              type: array
+              items:
+                type: object
+                properties:
+                  swapId:
+                    type: integer
+                  issuer:
+                    type: string
+                  alias:
+                    type: string
+                  akaObjAmount:
+                    type: integer
+                  xtzPerAkaObj:
+                    type: integer
+            auctions:
+              type: array
+              items:
+                type: object
+                properties:
+                  auctionId:
+                    type: integer
+                  issuer:
+                    type: string
+                  alias:
+                    type: string
+                  akaObjAmount:
+                    type: integer
+                  currentBidPrice:
+                    type: integer
+                  dueTime:
+                    type: integer
+                  auctionTitle:
+                    type: string
+            bundles:
+              type: array
+              items:
+                type: object
+                properties:
+                  bundleId:
+                    type: integer
+                  issuer:
+                    type: string
+                  alias:
+                    type: string
+                  bundleAmount:
+                    type: integer
+                  akaObjAmount:
+                    type: integer
+                  xtzPerBundle:
+                    type: integer
+                  bundleTitle:
+                    type: string
+            gachas:
+              type: array
+              items:
+                type: object
+                properties:
+                  gachaId:
+                    type: integer
+                  issuer:
+                    type: string
+                  alias:
+                    type: string
+                  akaObjRemain:
+                    type: integer
+                  xtzPerGacha:
+                    type: integer
+                  issueTime:
+                    type: integer
+                  cancelTime:
+                    type: integer
+                  gachaTitle:
+                    type: string
+        owners:
+          type: object
+        aliases:
+          type: object
+        totalAmount:
+          type: integer
+        tokenInfo:
+          $ref: '#/components/schemas/tokenInfo'
+    userAkaOBJ:
+      type: object
+      properties:
+        tokenId:
+          type: integer
+        ipfsHash:
+          type: string
+        amount:
+          nullable: true
+          type: integer
+        totalAmount:
+          nullable: true
+          type: integer
+        tokenInfo:
+          $ref: '#/components/schemas/tokenInfo'
+    record:
+      type: object
+      properties:
+        timestamp:
+          type: integer
+        tokenId:
+          nullable: true
+          type: integer
+        tokenName:
+          nullable: true
+          type: string
+        address:
+          nullable: true
+          type: string
+        alias:
+          nullable: true
+          type: string
+        type:
+          type: string
+        amount:
+          type: integer
+        price:
+          type: integer
+        auctionId:
+          nullable: true
+          type: integer
+        auctionTitle:
+          nullable: true
+          type: string
+        bundleId:
+          nullable: true
+          type: integer
+        bundleTitle:
+          nullable: true
+          type: string
+        gachaId:
+          nullable: true
+          type: integer
+        gachaTitle:
+          nullable: true
+          type: string
+    auction:
+      type: object
+      properties:
+        banned:
+          nullable: true
+          type: boolean
+        auctionId:
+          type: integer
+        tokenId:
+          type: integer
+        currentBidPrice:
+          type: integer
+        currentBidder:
+          type: string
+        currentStorePrice:
+          type: integer
+        directPrice:
+          type: integer
+        dueTime:
+          type: integer
+        issuer:
+          type: string
+        alias:
+          type: string
+        metadata:
+          $ref: "#/components/schemas/metadata"
+        priceHistory:
+          type: array
+          items:
+            type: object
+            properties:
+              bidPrice:
+                type: integer
+              bidder:
+                type: string
+              alias:
+                type: string
+              timestamp:
+                type: integer
+        priceHistoryId:
+          type: integer
+        raisePercentage:
+          type: integer
+        startPrice:
+          type: integer
+        ipfsHash:
+          type: string
+        tokenInfo:
+          nullable: true
+          $ref: '#/components/schemas/tokenInfo'
+    bundle:
+      type: object
+      properties:
+        banned:
+          nullable: true
+          type: boolean
+        bundleId:
+          type: integer
+        bundleAmount:
+          type: integer
+        issuer:
+          type: string
+        alias:
+          type: string
+        bundleItems:
+          type: array
+          items:
+            type: object
+            properties:
+              tokenId:
+                type: integer
+              amount:
+                type: integer
+              ipfsHash:
+                type: string
+              tokenInfo:
+                nullable: true
+                $ref: '#/components/schemas/tokenInfo'
+        metadata:
+          $ref: "#/components/schemas/metadata"
+        xtzPerBundle:
+          type: integer
+    gacha:
+      type: object
+      properties:
+        banned:
+          nullable: true
+          type: boolean
+        gachaId:
+          type: integer
+        cancelTime:
+          type: integer
+        gachaAmount:
+          type: integer
+        gachaTotal:
+          type: integer
+        gachaPlayTemains:
+          type: integer
+        issueTime:
+          type: integer
+        issuer:
+          type: string
+        alias:
+          type: string
+        gachaTtems:
+          type: array
+          items:
+            type: object
+            properties:
+              tokenId:
+                type: integer
+              remain:
+                type: integer
+              total:
+                type: integer
+              ipfsHash:
+                type: string
+              tokenInfo:
+                nullable: true
+                $ref: '#/components/schemas/tokenInfo'
+        lastPrizeTokenId:
+          type: integer
+        lastPrize:
+          type: object
+          properties:
+            tokenId:
+              type: integer
+            ipfsHash:
+              type: string
+            tokenInfo:
+              nullable: true
+              $ref: '#/components/schemas/tokenInfo'
+        metadata:
+          $ref: "#/components/schemas/metadata"
+        xtzPerGacha:
+          type: integer
+
+paths:
+  /tags:
+    get:
+      tags:
+        - tag
+      summary: Get tag list
+      description: Return all tag (used more than 2 times) of minted akaOBJ (without banned and burned)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tags:
+                    type: array
+                    items:
+                      type: string
+
+  /akaobjs:
+    get:
+      tags:
+        - akaOBJ
+      summary: Get akaOBJ list
+      description: To retrieve assets minted on akaSwap, call the /akaobjs endpoint. The endpoint will return two fields, "tokens" and "hasMore". "tokens" is an array of objects default sorted by tokenId, i.e., the latest ordering, "hasMore" is a boolean value that represents there has more pages. Each page contains at most 5 akaOBJs info (if an akaOBJ is burned or banned, it won’t be displayed on that page).
+      parameters:
+        - name: tag
+          in: query
+          description: return akaOBJs with tag (if set, other parameters (exclude counter and size) won't work.)
+          schema:
+            type: string
+        - name: curation
+          in: query
+          description: return akaOBJs in curation (if set, other parameters (exclude tag) won't work.)
+          schema:
+            type: string
+        - name: counter
+          in: query
+          description: counter of pages
+          schema:
+            type: integer
+        - name: size
+          in: query
+          description: return size of each page (default is 5, max is 30)
+          schema:
+            type: integer
+        - name: random
+          in: query
+          description: return in random order
+          schema:
+            type: boolean
+        - name: featured
+          in: query
+          description: return akaOBJs minted by featured artists
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tokens:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/akaOBJ'
+                  hasMore:
+                    type: boolean
+
+  /akaobjs/{tokenId}:
+    get:
+      tags:
+        - akaOBJ
+      summary: Get akaOBJ
+      description: To retrieve akaOBJ on the akaSwap, call the /akaobjs/{tokenId} endpoint. The endpoint will return "banned" or "token" or empty object (don't exist or burned).
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  banned:
+                    nullable: true
+                    type: boolean
+                  token:
+                    nullable: true
+                    $ref: '#/components/schemas/akaOBJ'
+
+  /akaobjs/{tokenId}/records:
+    get:
+      tags:
+        - akaOBJ
+      summary: Get records of akaOBJ
+      description: To retrieve records of akaOBJ on the akaSwap, call the /akaobjs/{tokenId}/records endpoint. The endpoint will return "banned" or "token" or empty object(don't exist or burned).
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  banned:
+                    nullable: true
+                    type: boolean
+                  records:
+                    nullable: true
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/record'
+
+  /accounts/{address}/akadao:
+    get:
+      tags:
+        - account
+      summary: Get user's akaDAO
+      description: Return user's akaDAO
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  banned:
+                    nullable: true
+                    type: boolean
+                  akaDao:
+                    nullable: true
+                    type: integer
+
+  /accounts/{address}/creations:
+    get:
+      tags:
+        - account
+      summary: Get user's creations
+      description: Return user's creations
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  banned:
+                    nullable: true
+                    type: boolean
+                  creations:
+                    nullable: true
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/userAkaOBJ'
+
+  /accounts/{address}/collections:
+    get:
+      tags:
+        - account
+      summary: Get user's collections
+      description: Return user's collections
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  banned:
+                    nullable: true
+                    type: boolean
+                  collections:
+                    nullable: true
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/userAkaOBJ'
+
+  /accounts/{address}/auctions:
+    get:
+      tags:
+        - account
+      summary: Get user's auctions
+      description: Return user's auctions
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  banned:
+                    nullable: true
+                    type: boolean
+                  auctions:
+                    nullable: true
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/auction'
+
+  /accounts/{address}/bundles:
+    get:
+      tags:
+        - account
+      summary: Get user's bundles
+      description: Return user's bundles
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  banned:
+                    nullable: true
+                    type: boolean
+                  bundles:
+                    nullable: true
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/bundle'
+
+  /accounts/{address}/gachas:
+    get:
+      tags:
+        - account
+      summary: Get user's gachas
+      description: Return user's gachas
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  banned:
+                    nullable: true
+                    type: boolean
+                  gachas:
+                    nullable: true
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/gacha'
+
+  /accounts/{address}/records:
+    get:
+      tags:
+        - account
+      summary: Get user's records
+      description: Return user's records
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  banned:
+                    nullable: true
+                    type: boolean
+                  records:
+                    nullable: true
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/record'
+
+  /accounts/{address}/akaobjs:
+    get:
+      tags:
+        - account
+      summary: Get user's akaOBJs
+      description: Return user's akaOBJs
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  banned:
+                    nullable: true
+                    type: boolean
+                  tokens:
+                    nullable: true
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/userAkaOBJ'
+
+  /auctions:
+    get:
+      tags:
+        - auction
+      summary: Get auction list
+      description: Return auction list
+      parameters:
+        - name: counter
+          in: query
+          description: Counter of pages
+          schema:
+            type: integer
+        - name: size
+          in: query
+          description: return size of each page (default is 5, max is 30)
+          schema:
+            type: integer
+        - name: days
+          in: query
+          description: Was made in x days
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  auctions:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/auction'
+                  hasMore:
+                    type: boolean
+
+  /auctions/{auctionId}:
+    get:
+      tags:
+        - auction
+      summary: Get auction
+      description: Return auction info
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  banned:
+                    nullable: true
+                    type: boolean
+                  auction:
+                    nullable: true
+                    $ref: '#/components/schemas/auction'
+
+  /bundles:
+    get:
+      tags:
+        - bundle
+      summary: Get bundle list
+      description: Return bundle list
+      parameters:
+        - name: counter
+          in: query
+          description: Counter of pages
+          schema:
+            type: integer
+        - name: size
+          in: query
+          description: return size of each page (default is 5, max is 30)
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  bundles:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/bundle'
+                  hasMore:
+                    type: boolean
+
+  /bundles/{bundleId}:
+    get:
+      tags:
+        - bundle
+      summary: Get bundle
+      description: Return bundle info
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  banned:
+                    nullable: true
+                    type: boolean
+                  bundle:
+                    nullable: true
+                    $ref: '#/components/schemas/bundle'
+
+  /gachas:
+    get:
+      tags:
+        - gacha
+      summary: Get gacha list
+      description: Return gacha list
+      parameters:
+        - name: counter
+          in: query
+          description: Counter of pages
+          schema:
+            type: integer
+        - name: size
+          in: query
+          description: return size of each page (default is 5, max is 30)
+          schema:
+            type: integer
+        - name: days
+          in: query
+          description: Was made in x days
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  gachas:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/gacha'
+                  hasMore:
+                    type: boolean
+
+  /gachas/{gachaId}:
+    get:
+      tags:
+        - gacha
+      summary: Get gacha
+      description: Return gacha info
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  banned:
+                    nullable: true
+                    type: boolean
+                  gacha:
+                    nullable: true
+                    $ref: '#/components/schemas/gacha'
+                    
+  /gachas/{gachaId}/records:
+    get:
+      tags:
+        - gacha
+      summary: Get gacha records
+      description: Return gacha records
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  banned:
+                    nullable: true
+                    type: boolean
+                  records:
+                    nullable: true
+                    properties:
+                      timestamp:
+                        type: integer
+                      tokenId:
+                        type: integer
+                      tokenName:
+                        type: string
+                      collector:
+                        type: string
+                      alias:
+                        type: string
+                      amount:
+                        type: integer

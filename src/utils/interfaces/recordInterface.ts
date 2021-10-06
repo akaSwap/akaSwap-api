@@ -1,0 +1,16 @@
+interface TransferRecord {
+    timestamp: number,
+    tokenId?: number,
+    tokenName?: string,
+    address?: string,
+    alias?: string,
+    type: string,
+    amount: number,
+    price: number,
+    auctionId?: number,
+    auctionTitle?: string,
+    bundleId?: number,
+    bundleTitle?: string,
+    gachaId?: number,
+    gachaTitle?: string,
+}
