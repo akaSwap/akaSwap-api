@@ -20,7 +20,12 @@ const app = new koa();
 app.use(cors());
 app.use(json({ pretty: false }));
 // app.use(json({ pretty: true }));
-app.use(koaBody());
+app.use(koaBody({
+    jsonLimit: '100mb',
+    formLimit: '100mb',
+    textLimit: '100mb',
+    multipart: true,
+}));
 app.use(router.routes())
 // app.use(router.allowedMethods());
 
