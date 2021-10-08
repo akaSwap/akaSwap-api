@@ -16,6 +16,7 @@
     "bignumber.js": "^9.0.1",
     "bottleneck": "^2.19.5",
     "conseiljs": "^5.0.8",
+    "ipfs-http-client": "^53.0.1",
     "koa": "^2.13.1",
     "koa-body": "^4.2.0",
     "koa-json": "^2.0.2",
@@ -27,9 +28,9 @@
   },
   "devDependencies": {
     "@types/koa": "^2.13.1",
+    "@types/koa__cors": "^3.0.2",
     "@types/koa-json": "^2.0.18",
     "@types/koa-router": "^7.4.2",
-    "@types/koa__cors": "^3.0.2",
     "@types/lodash": "^4.14.168",
     "@types/mongodb": "^3.6.12",
     "@types/node-fetch": "^2.5.10"
