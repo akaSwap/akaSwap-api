@@ -6,6 +6,7 @@ import config from '../config/config';
 import utils from '../utils/utils';
 import pack from './common/pack';
 import pattern from './common/pattern';
+import tzkt from './common/tzkt';
 import accountService from './accountService';
 import akaObjService from './akaObjService';
 
@@ -376,23 +377,27 @@ async function getGachaRecords(gachaId: number) {
     if (gacha === null) {
         return [];
     }
-    let flag = false;
-    const operations: any[] = [];
-    const gachaItemIds = gacha.gachaItems.map(item => utils.toInt(item.tokenId));
-    gachaItemIds.push(utils.toInt(gacha.lastPrizeTokenId));
-    (await getOracleGachaOperationsFrom(gacha.issueTime))
-        .forEach((operation: any) => {
-            if (operation.entrypoint === 'oracle_gacha') {
-                flag = false;
-                operation.storage_diff.children[9].children.forEach((child: any) => {
-                    if (child.name === `${gachaId}`) {
-                        flag = true;
-                    }
-                })
-            } else if (flag && operation.entrypoint === 'transfer' && operation.destination === config.akaNftContract) {
-                operations.push(operation);
+    const transactions: any[] = [];
+    const gachaItemIds = gacha.gachaItems.map(item => item.tokenId);
+    gachaItemIds.push(gacha.lastPrizeTokenId);
+    
+    const oracleGachas = await getOracleGachaTransactionsFrom(gacha.issueTime);
+    await Promise.all(oracleGachas.map(async (tx: any) => {
+        let flag = false;
+        const transactionGroup = await tzkt.getTransactionGroup(tx.hash);
+        transactionGroup[0].diffs.forEach((diff: any) => {
+            if (diff.content.key === `${gachaId}`) {
+                flag = true;
             }
-        })
+        });
+        if (flag) {
+            transactionGroup.forEach((transaction: any) => {
+                if (transaction.parameter?.entrypoint === 'transfer' && transaction.target.address === config.akaNftContract) {
+                    transactions.push(transaction);
+                }
+            })
+        }
+    }));
 
     const records: {
         timestamp: number,
@@ -402,19 +407,19 @@ async function getGachaRecords(gachaId: number) {
         alias: string,
         amount: number,
     }[] = [];
-    await Promise.all(operations.map(async (operation: any) => {
-        await Promise.all(operation.parameters[0].children[0].children[1].children.map(async (txs: any) => {
-            const tokenId = utils.toInt(txs.children[1].value);
+    await Promise.all(transactions.map(async (transaction: any) => {
+        await Promise.all(transaction.parameter.value[0].txs.map(async (tx: any) => {
+            const tokenId = parseInt(tx.token_id);
             if (gachaItemIds.includes(tokenId)) {
                 const akaObj = await akaObjService.getAkaObj(tokenId, false, true);
-                const collector = txs.children[0].value;
+                const collector = tx.to_;
                 records.push({
-                    timestamp: new Date(operation.timestamp).getTime() / 1000,
+                    timestamp: new Date(transaction.timestamp).getTime() / 1000,
                     tokenId: tokenId,
                     tokenName: akaObj?.tokenInfo.name,
                     collector: collector,
                     alias: (await accountService.getAccountAliases([collector]))[0],
-                    amount: utils.toInt(txs.children[2].value),
+                    amount: parseInt(tx.amount),
                 });
             }
         }));
@@ -425,29 +430,16 @@ async function getGachaRecords(gachaId: number) {
     return records;
 }
 
-async function getOracleGachaOperationsFrom(timestamp: number) {
+async function getOracleGachaTransactionsFrom(timestamp: number) {
     const gachaAddress = getAkaGachaAddress({timestamp: timestamp});
+    const date = new Date(timestamp * 1000).toISOString();
     const url =
-        `${config.bcdServer}/v1/contract/${config.bcdNetwork}/${gachaAddress}/operations` +
-        `?entrypoints=oracle_gacha&status=applied&with_storage_diff=true&from=${timestamp}000`;
+        `${config.tzktServer}/v1/operations/transactions` +
+        `?target=${gachaAddress}&entrypoint=oracle_gacha&status=applied&timestamp.ge=${date}&limit=100`;
 
-    let data = (await axios.get(url)).data;
-    let operations = data.operations;
+    const data = (await axios.get(url)).data;
 
-    let prevLength = 0;
-    let prevLastId = 0;
-    while (operations.length !== prevLength) {
-        prevLength = operations.length;
-        let lastId = parseInt(data.last_id);
-        if (lastId !== prevLastId) {
-            prevLastId = lastId;
-            lastId -= 1;
-        }
-        data = (await axios.get(url + `&last_id=${lastId}`)).data;
-        operations = _.unionWith(operations, data.operations, _.isEqual);
-    }
-
-    return operations;
+    return data;
 }
 
 async function fillGachaInfo(gacha: Gacha) {
@@ -489,6 +481,6 @@ export default {
     getCollectOperations,
     getGachaPlayInfo,
     getGachaRecords,
-    getOracleGachaOperationsFrom,
+    getOracleGachaTransactionsFrom,
     fillGachaInfo
 }
