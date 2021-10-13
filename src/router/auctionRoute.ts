@@ -13,16 +13,17 @@ async function getAuctions(ctx: koa.ParameterizedContext) {
     const auctions = await auctionService.getAuctions('', days);
     const paginatedFeed = utils.paginateFeed(auctions, counter, size);
 
-    await Promise.all(paginatedFeed.map(async (auction) =>
-        // await utils.fillAuctionInfo(auction)
-        Object.assign(
-            auction, 
-            (await axios.get(`http://127.0.0.1:${config.serverPort}/auctions/${auction.auctionId}`)).data.auction
-        )
-    ));
+    await Promise.all(paginatedFeed.map(async (auction) =>{
+        const data = (await axios.get(`http://127.0.0.1:${config.serverPort}/auctions/${auction.auctionId}`)).data;
+        if (data.auction !== undefined) {
+            Object.assign(auction, data.auction);
+        } else {
+            auction.banned = true;
+        }
+    }));
 
     const feed = paginatedFeed
-        .filter(auction => auction !== undefined)
+        .filter(auction => auction.banned === undefined)
         .sort((a, b) => b.auctionId - a.auctionId);
 
     return { 
