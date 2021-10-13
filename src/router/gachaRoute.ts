@@ -13,17 +13,17 @@ async function getGachas(ctx: koa.ParameterizedContext) {
     const gachas = await gachaService.getGachas('', days);
     const paginatedFeed = utils.paginateFeed(gachas, counter, size);
 
-    await Promise.all(paginatedFeed.map(async (gacha) =>
-        // await utils.fillGachaInfo(gacha)
-        Object.assign(
-            gacha, 
-            (await axios.get(`http://127.0.0.1:${config.serverPort}/gachas/${gacha.gachaId}`)).data.gacha
-        )
-    ));
+    await Promise.all(paginatedFeed.map(async (gacha) => {
+        const data = (await axios.get(`http://127.0.0.1:${config.serverPort}/gachas/${gacha.gachaId}`)).data;
+        if (data.gacha !== undefined) {
+            Object.assign(gacha, data.gacha);
+        } else {
+            gacha.banned = true;
+        }
+    }));
 
     const feed = paginatedFeed
-        // .filter(gacha => gacha.banned === undefined)
-        .filter(gacha => gacha !== undefined)
+        .filter(gacha => gacha.banned === undefined)
         .sort((a, b) => b.gachaId - a.gachaId);
 
     return { 
