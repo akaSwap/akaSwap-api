@@ -8,6 +8,7 @@ import { getAkaObjs, getAkaObj, getAkaObjRecords, getAkaObjsByTag, getAkaObjsByC
 import { getAuction, getAuctions } from './auctionRoute';
 import { getBundle, getBundles } from './bundleRoute';
 import { getGacha, getGachaRecords, getGachas } from './gachaRoute';
+import { uploadDataToIpfs } from './ipfsRoute';
 import { getTags } from './tagRoute';
 
 const CACHE_TIME = config.cacheTime * utils.MILLISECOND_MODIFIER
@@ -113,6 +114,10 @@ router
     .post('/internal/accounts/:address/metadata', async(ctx, next) => {
         updateAccountMetadata(ctx);
         ctx.response.status = 204;
+    })
+    .post('/internal/ipfs/upload', async(ctx, next) => {
+        ctx.body = await uploadDataToIpfs(ctx);
+        ctx.response.status = 201;
     })
 
 export {

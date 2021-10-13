@@ -1,4 +1,7 @@
 import axios from 'axios';
+import * as formidable from 'formidable';
+import { createReadStream } from 'fs';
+import { create } from 'ipfs-http-client';
 import * as _ from 'lodash';
 
 import config from '../../config/config';
@@ -42,7 +45,19 @@ async function pinIpfsData(ipfsHash: string) {
         });
 }
 
+async function addDataToLocalIpfs(files: formidable.File[]) {
+    const ipfsClient = await create();
+    const data = files.map((file) => {
+        const path = file.name === null ? '' : file.name;
+        return { path: decodeURIComponent(path), content: createReadStream(file.path) };
+    });
+    for await (const result of ipfsClient.addAll(data, { pin: false, wrapWithDirectory: (data.length > 1) })) {
+        console.log(`add ${result.cid} to local ipfs`);
+    }
+}
+
 export default {
     getIpfsData,
-    pinIpfsData
+    pinIpfsData,
+    addDataToLocalIpfs,
 }
