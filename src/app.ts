@@ -1,6 +1,6 @@
 import * as koa from 'koa';
 import * as json from 'koa-json';
-import * as bodyparser from 'koa-bodyparser';
+import * as koaBody from 'koa-body';
 import * as cors from '@koa/cors';
 import * as conseiljs from 'conseiljs';
 import * as log from 'loglevel';
@@ -20,7 +20,12 @@ const app = new koa();
 app.use(cors());
 app.use(json({ pretty: false }));
 // app.use(json({ pretty: true }));
-app.use(bodyparser());
+app.use(koaBody({
+    jsonLimit: '100mb',
+    formLimit: '100mb',
+    textLimit: '100mb',
+    multipart: true,
+}));
 app.use(router.routes())
 // app.use(router.allowedMethods());
 

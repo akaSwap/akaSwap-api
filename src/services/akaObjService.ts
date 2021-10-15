@@ -4,11 +4,11 @@ import * as _ from 'lodash';
 import config from '../config/config';
 import * as mongodb from '../utils/mongodb';
 import utils from '../utils/utils';
-import bcd from './common/bcd';
 import conseil from './common/conseil';
 import ipfs from './common/ipfs';
 import pack from './common/pack';
 import pattern from './common/pattern';
+import tzkt from './common/tzkt';
 import accountService from './accountService';
 import auctionService from './auctionService';
 import bundleService from './bundleService';
@@ -852,9 +852,9 @@ async function getAkaObjRecords(tokenId: number) {
                         const blockLevel = operation.block_level;
                         const [sameLevelOperations, storage] = await Promise.all([
                             conseil.getOperationsAtLevel('swap', config.akaMetaverse, blockLevel),
-                            bcd.getContractStorage(config.akaMetaverse, blockLevel - 1)
+                            tzkt.getContractStorage(config.akaMetaverse, blockLevel - 1)
                         ]);
-                        let swapId = utils.toInt(storage[0].children[9].value);
+                        let swapId = parseInt(storage.swap_id);
                         for (let i = 0; i < sameLevelOperations.length; ++i) {
                             if (sameLevelOperations[i].operation_group_hash === transfer.operationGroupHash) {
                                 swapId += i;
@@ -869,9 +869,8 @@ async function getAkaObjRecords(tokenId: number) {
             case 'cancel_swap':
                 {
                     const swapId = parseInt(operation.parameters);
-                    const keyHash = await conseil.getKeyHash(config.nftSwapMap, swapId.toString());
-                    const bigMapDiff = await bcd.getBigMapDiff(config.nftSwapMap, keyHash);
-                    record.price = utils.toInt(bigMapDiff.values[1].value.children[4].value);
+                    const content = await tzkt.getBigMapContent(config.nftSwapMap, swapId.toString());
+                    record.price = parseInt(content.value.xtz_per_akaOBJ);
                     record.address = transfer.to;
                     record.alias = (await accountService.getAccountAliases([transfer.to]))[0];
                 }
@@ -886,11 +885,10 @@ async function getAkaObjRecords(tokenId: number) {
             case 'close_auction':
                 {
                     const auctionId = parseInt(operation.parameters);
-                    const keyHash = await conseil.getKeyHash(config.nftAuctionMap, auctionId.toString());
-                    const bigMapDiff = await bcd.getBigMapDiff(config.nftAuctionMap, keyHash);
+                    const content = await tzkt.getBigMapContent(config.nftAuctionMap, auctionId.toString());
                     record.address = transfer.to;
                     record.alias = (await accountService.getAccountAliases([transfer.to]))[0];
-                    record.price = utils.toInt(bigMapDiff.values[1].value.children[3].value);
+                    record.price = parseInt(content.value.current_store_price);
                     record.type = 'collect_auction';
                     record.auctionId = auctionId;
                 }
@@ -903,9 +901,9 @@ async function getAkaObjRecords(tokenId: number) {
                         const blockLevel = operation.block_level;
                         const [sameLevelOperations, storage] = await Promise.all([
                             conseil.getOperationsAtLevel('make_auction', config.akaAuction, blockLevel),
-                            bcd.getContractStorage(config.akaAuction, blockLevel - 1)
+                            tzkt.getContractStorage(config.akaAuction, blockLevel - 1)
                         ]);
-                        let auctionId = utils.toInt(storage[0].children[3].value);
+                        let auctionId = parseInt(storage.auction_id);
                         for (let i = 0; i < sameLevelOperations.length; ++i) {
                             if (sameLevelOperations[i].operation_group_hash === transfer.operationGroupHash) {
                                 auctionId += i;
@@ -922,9 +920,8 @@ async function getAkaObjRecords(tokenId: number) {
             case 'cancel_auction':
                 {
                     const auctionId = parseInt(operation.parameters);
-                    const keyHash = await conseil.getKeyHash(config.nftAuctionMap, auctionId.toString());
-                    const bigMapDiff = await bcd.getBigMapDiff(config.nftAuctionMap, keyHash);
-                    record.price = utils.toInt(bigMapDiff.values[1].value.children[9].value);
+                    const content = await tzkt.getBigMapContent(config.nftAuctionMap, auctionId.toString());
+                    record.price = parseInt(content.value.start_price);
                     record.auctionId = auctionId;
                     record.address = transfer.to;
                     record.alias = (await accountService.getAccountAliases([transfer.to]))[0];
@@ -945,9 +942,9 @@ async function getAkaObjRecords(tokenId: number) {
                         const blockLevel = operation.block_level;
                         const [sameLevelOperations, storage] = await Promise.all([
                             conseil.getOperationsAtLevel('make_bundle', config.akaBundle, blockLevel),
-                            bcd.getContractStorage(config.akaBundle, blockLevel - 1)
+                            tzkt.getContractStorage(config.akaBundle, blockLevel - 1)
                         ]);
-                        let bundleId = utils.toInt(storage[0].children[3].value);
+                        let bundleId = parseInt(storage.bundle_id);
                         for (let i = 0; i < sameLevelOperations.length; ++i) {
                             if (sameLevelOperations[i].operation_group_hash === transfer.operationGroupHash) {
                                 bundleId += i;
@@ -964,9 +961,8 @@ async function getAkaObjRecords(tokenId: number) {
             case 'cancel_bundle':
                 {
                     const bundleId = parseInt(operation.parameters);
-                    const keyHash = await conseil.getKeyHash(config.nftBundleMap, bundleId.toString());
-                    const bigMapDiff = await bcd.getBigMapDiff(config.nftBundleMap, keyHash);
-                    record.price = utils.toInt(bigMapDiff.values[1].value.children[4].value);
+                    const content = await tzkt.getBigMapContent(config.nftBundleMap, bundleId.toString());
+                    record.price = parseInt(content.value.xtz_per_bundle);
                     record.bundleId = bundleId;
                     record.address = transfer.to;
                     record.alias = (await accountService.getAccountAliases([transfer.to]))[0];
@@ -978,19 +974,16 @@ async function getAkaObjRecords(tokenId: number) {
                     const blockLevel = operation.block_level;
                     const gachaAddress = gachaService.getAkaGachaAddress({blockLevel: blockLevel});
                     const [previousStorage, storage] = await Promise.all([
-                        bcd.getContractStorage(gachaAddress, blockLevel - 1),
-                        bcd.getContractStorage(gachaAddress, blockLevel)
+                        tzkt.getContractStorage(gachaAddress, blockLevel - 1),
+                        tzkt.getContractStorage(gachaAddress, blockLevel)
                     ]);
-                    const startId = utils.toInt(previousStorage[0].children[15].value);
-                    const endId = utils.toInt(storage[0].children[15].value);
+                    const startId = parseInt(previousStorage.oracle_play_id);
+                    const endId = parseInt(storage.oracle_play_id);
                     const gachaPlayInfo = await gachaService.getGachaPlayInfo(_.range(startId, endId), transfer.to);
                     const gachaId = gachaPlayInfo[0].gachaId;
                     const gachaMap = gachaService.getNftGachaMap({gachaId: gachaId});
-                    const keyHash = await conseil.getKeyHash(gachaMap, gachaId.toString());
-                    const bigMapDiff = await bcd.getBigMapDiff(gachaMap, keyHash);
-                    record.price = bigMapDiff.values[0].value !== null ? 
-                        utils.toInt(bigMapDiff.values[0].value.children[8].value) :
-                        utils.toInt(bigMapDiff.values[1].value.children[8].value)
+                    const content = await tzkt.getBigMapContent(gachaMap, gachaId.toString());
+                    record.price = parseInt(content.value.xtz_per_gacha); 
                     record.type = 'collect_gacha';
                     record.gachaId = gachaId;
                     record.gachaTitle = (await gachaService.getGacha(record.gachaId))?.metadata.title;
@@ -1007,9 +1000,9 @@ async function getAkaObjRecords(tokenId: number) {
                         const gachaAddress = gachaService.getAkaGachaAddress({blockLevel: blockLevel});
                         const [sameLevelOperations, storage] = await Promise.all([
                             conseil.getOperationsAtLevel('make_gacha', gachaAddress, blockLevel),
-                            bcd.getContractStorage(gachaAddress, blockLevel - 1)
+                            tzkt.getContractStorage(gachaAddress, blockLevel - 1)
                         ]);
-                        let gachaId = utils.toInt(storage[0].children[4].value);
+                        let gachaId = parseInt(storage.gacha_id);
                         for (let i = 0; i < sameLevelOperations.length; ++i) {
                             if (sameLevelOperations[i].operation_group_hash === transfer.operationGroupHash) {
                                 gachaId += i;
@@ -1027,9 +1020,8 @@ async function getAkaObjRecords(tokenId: number) {
                 {
                     const gachaId = parseInt(operation.parameters);
                     const gachaMap = gachaService.getNftGachaMap({gachaId: gachaId});
-                    const keyHash = await conseil.getKeyHash(gachaMap, gachaId.toString());
-                    const bigMapDiff = await bcd.getBigMapDiff(gachaMap, keyHash);
-                    record.price = utils.toInt(bigMapDiff.values[1].value.children[8].value);
+                    const content = await tzkt.getBigMapContent(gachaMap, gachaId.toString());
+                    record.price = parseInt(content.value.xtz_per_gacha); 
                     record.gachaId = gachaId;
                     record.address = transfer.to;
                     record.alias = (await accountService.getAccountAliases([transfer.to]))[0];

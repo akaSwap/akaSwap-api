@@ -4,7 +4,7 @@ API backend for the [akaSwap](https://akaswap.com) deployed on the Tezos blockch
 
 This repository was derived from [hicetnunc-api](https://github.com/hicetnunc2000/hicetnunc-api).
 
-Built with [Conseil API](https://github.com/Cryptonomic/Conseil), [Better-Call Dev API](https://better-call.dev/) and [TzKT API](https://tzkt.io/).
+Built with [Conseil API](https://github.com/Cryptonomic/Conseil) and [TzKT API](https://tzkt.io/).
 
 ## Documentation
 

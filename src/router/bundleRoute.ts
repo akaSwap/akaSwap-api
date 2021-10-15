@@ -12,17 +12,17 @@ async function getBundles(ctx: koa.ParameterizedContext) {
     const bundles = await bundleService.getBundles('');
     const paginatedFeed = utils.paginateFeed(bundles, counter, size);
 
-    await Promise.all(paginatedFeed.map(async (bundle) =>
-        // await utils.fillBundleInfo(bundle)
-        Object.assign(
-            bundle, 
-            (await axios.get(`http://127.0.0.1:${config.serverPort}/bundles/${bundle.bundleId}`)).data.bundle
-        )
-    ));
+    await Promise.all(paginatedFeed.map(async (bundle) => {
+        const data = (await axios.get(`http://127.0.0.1:${config.serverPort}/bundles/${bundle.bundleId}`)).data;
+        if (data.bundle !== undefined) {
+            Object.assign(bundle, data.bundle);
+        } else {
+            bundle.banned = true;
+        }
+    }));
 
     const feed = paginatedFeed
-        // .filter(bundle => bundle.banned === undefined)
-        .filter(bundle => bundle !== undefined && bundle.banned === undefined)
+        .filter(bundle => bundle.banned === undefined)
         .sort((a, b) => b.bundleId - a.bundleId);
 
     return { 

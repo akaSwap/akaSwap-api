@@ -19,8 +19,7 @@ export default {
     conseilApiKey: '',
     conseilNetwork: 'mainnet',
 
-    bcdServer: 'https://api.better-call.dev',
-    bcdNetwork: 'mainnet',
+    tzktServer: 'https://api.tzkt.io',
 
     burnAddress: 'tz1burnburnburnburnburnburnburjAYjjX',
     itemsPerPage: 5,
