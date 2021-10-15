@@ -7,15 +7,15 @@ import * as _ from 'lodash';
 import config from '../../config/config';
 
 async function getIpfsData(ipfsHash: string) {
-    let res = await axios.get(`${config.localIpfsUrl}/ipfs/` + ipfsHash, { timeout: 1000 }).catch(e => e);
+    let res = await axios.get<any>(`${config.localIpfsUrl}/ipfs/` + ipfsHash, { timeout: 1000 }).catch(e => e);
     if (res.data === undefined) {
-        res = await axios.get('https://infura-ipfs.io/ipfs/' + ipfsHash, { timeout: 1000 }).catch(e => e);
+        res = await axios.get<any>('https://infura-ipfs.io/ipfs/' + ipfsHash, { timeout: 1000 }).catch(e => e);
     }
     if (res.data === undefined) {
-        res = await axios.get('https://dweb.link/ipfs/' + ipfsHash, { timeout: 1000 }).catch(e => e);
+        res = await axios.get<any>('https://dweb.link/ipfs/' + ipfsHash, { timeout: 1000 }).catch(e => e);
     }
     if (res.data === undefined) {
-        res = await axios.get('https://cloudflare-ipfs.com/ipfs/' + ipfsHash, { timeout: 1000 }).catch(e => e);
+        res = await axios.get<any>('https://cloudflare-ipfs.com/ipfs/' + ipfsHash, { timeout: 1000 }).catch(e => e);
     }
     return res.data;
 }

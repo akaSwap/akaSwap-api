@@ -14,7 +14,7 @@ async function getAuctions(ctx: koa.ParameterizedContext) {
     const paginatedFeed = utils.paginateFeed(auctions, counter, size);
 
     await Promise.all(paginatedFeed.map(async (auction) =>{
-        const data = (await axios.get(`http://127.0.0.1:${config.serverPort}/auctions/${auction.auctionId}`)).data;
+        const data = (await axios.get<any>(`http://127.0.0.1:${config.serverPort}/auctions/${auction.auctionId}`)).data;
         if (data.auction !== undefined) {
             Object.assign(auction, data.auction);
         } else {
