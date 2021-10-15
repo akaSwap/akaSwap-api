@@ -13,7 +13,7 @@ async function getBundles(ctx: koa.ParameterizedContext) {
     const paginatedFeed = utils.paginateFeed(bundles, counter, size);
 
     await Promise.all(paginatedFeed.map(async (bundle) => {
-        const data = (await axios.get(`http://127.0.0.1:${config.serverPort}/bundles/${bundle.bundleId}`)).data;
+        const data = (await axios.get<any>(`http://127.0.0.1:${config.serverPort}/bundles/${bundle.bundleId}`)).data;
         if (data.bundle !== undefined) {
             Object.assign(bundle, data.bundle);
         } else {

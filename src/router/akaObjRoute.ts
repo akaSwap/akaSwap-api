@@ -36,7 +36,7 @@ async function getAkaObjs(ctx: koa.ParameterizedContext) {
     const feed = (await Promise.all<AkaObj>(
         paginatedFeed.map(async (token) =>
             // await utils.getAkaObjById(id)
-            (await axios.get(`http://127.0.0.1:${config.serverPort}/akaobjs/${token.tokenId}`)).data.token
+            (await axios.get<any>(`http://127.0.0.1:${config.serverPort}/akaobjs/${token.tokenId}`)).data.token
         )
     ))
     .filter(token => 
@@ -86,7 +86,7 @@ async function getAkaObjRecords(ctx: koa.ParameterizedContext) {
     const akaObj: {
         banned: boolean,
         token: AkaObj,
-    } = (await axios.get(`http://127.0.0.1:${config.serverPort}/akaobjs/${tokenId}`)).data;
+    } = (await axios.get<any>(`http://127.0.0.1:${config.serverPort}/akaobjs/${tokenId}`)).data;
     
     if (akaObj.token === undefined) {
         return { banned: akaObj.banned };
@@ -135,7 +135,7 @@ async function getAkaObjsByTag(ctx: koa.ParameterizedContext) {
 
     const feed = (await Promise.all<AkaObj>(paginatedFeed.map(async (token) => 
         // await utils.getAkaObjById(id)
-        (await axios.get(`http://127.0.0.1:${config.serverPort}/akaobjs/${token.tokenId}`)).data.token
+        (await axios.get<any>(`http://127.0.0.1:${config.serverPort}/akaobjs/${token.tokenId}`)).data.token
     )))
     .filter(token => 
         // token !== null &&
@@ -160,7 +160,7 @@ async function getAkaObjsByCuration(ctx: koa.ParameterizedContext) {
         if (curation.name === curationName) {
             results = (await Promise.all<AkaObj>(curation.akaOBJs.map(async (tokenId: number) => 
                 // await utils.getAkaObjById(id)
-                (await axios.get(`http://127.0.0.1:${config.serverPort}/akaobjs/${tokenId}`)).data.token
+                (await axios.get<any>(`http://127.0.0.1:${config.serverPort}/akaobjs/${tokenId}`)).data.token
             )))
             .filter(o => 
                 // o !== null &&

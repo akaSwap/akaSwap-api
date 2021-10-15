@@ -14,7 +14,7 @@ async function getGachas(ctx: koa.ParameterizedContext) {
     const paginatedFeed = utils.paginateFeed(gachas, counter, size);
 
     await Promise.all(paginatedFeed.map(async (gacha) => {
-        const data = (await axios.get(`http://127.0.0.1:${config.serverPort}/gachas/${gacha.gachaId}`)).data;
+        const data = (await axios.get<any>(`http://127.0.0.1:${config.serverPort}/gachas/${gacha.gachaId}`)).data;
         if (data.gacha !== undefined) {
             Object.assign(gacha, data.gacha);
         } else {
@@ -47,7 +47,7 @@ async function getGacha(ctx: koa.ParameterizedContext) {
 async function getGachaRecords(ctx: koa.ParameterizedContext) {
     const gachaId = typeof ctx.params.gachaId === 'string' ? parseInt(ctx.params.gachaId) : 0;
     
-    const gacha = (await axios.get(`http://127.0.0.1:${config.serverPort}/gachas/${gachaId}`)).data
+    const gacha = (await axios.get<any>(`http://127.0.0.1:${config.serverPort}/gachas/${gachaId}`)).data
     if (gacha.gacha === undefined) {
         return { banned: gacha.banned };
     }
