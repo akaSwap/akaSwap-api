@@ -449,7 +449,7 @@ async function fillGachaInfo(gacha: Gacha) {
     ]);
 
     let banned = false;
-    const [noUse, lastPrizeTokenInfo] = await Promise.all([
+    const [, lastPrizeTokenInfo] = await Promise.all([
         Promise.all(gacha.gachaItems.map(async (item) => {
             item.tokenInfo = await akaObjService.getAkaObjTokenInfo(item);
             if (restrictedAkaObjs.includes(item.tokenId) ||
