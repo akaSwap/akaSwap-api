@@ -437,7 +437,7 @@ async function getOracleGachaTransactionsFrom(timestamp: number) {
         `${config.tzktServer}/v1/operations/transactions` +
         `?target=${gachaAddress}&entrypoint=oracle_gacha&status=applied&timestamp.ge=${date}&limit=100`;
 
-    const data = (await axios.get(url)).data;
+    const data = (await axios.get<any>(url)).data;
 
     return data;
 }

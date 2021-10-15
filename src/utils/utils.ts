@@ -49,7 +49,7 @@ function toInt(value: string | number) {
 
 async function getFeaturedAddresses(): Promise<string[]> {
     return (
-        await axios.get(
+        await axios.get<any>(
             `${config.apiUrl}/list/featured.json`
         )
     ).data;
@@ -57,7 +57,7 @@ async function getFeaturedAddresses(): Promise<string[]> {
 
 async function getRestrictedAddresses(): Promise<string[]> {
     return (
-        await axios.get(
+        await axios.get<any>(
             `${config.apiUrl}/list/wallet.json`
         )
     ).data;
@@ -65,7 +65,7 @@ async function getRestrictedAddresses(): Promise<string[]> {
 
 async function getRestrictedTokenIds(): Promise<number[]> {
     return (
-        await axios.get(
+        await axios.get<any>(
             `${config.apiUrl}/list/akaobj.json`
         )
     ).data;
@@ -83,7 +83,7 @@ async function getBurnedTokenIds(): Promise<number[]> {
 
 async function getCurations() {
     return (
-        await axios.get(
+        await axios.get<any>(
             `${config.apiUrl}/list/gallery_list.json`
         )
     ).data;

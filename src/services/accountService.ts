@@ -925,7 +925,7 @@ async function updateAccountMetadata(address: string) {
     const filter = { address: address };
     const metadata = await dbCollection.findOne(filter);
     if (metadata === null || (Date.now() - metadata.timestamp) > utils.ONE_WEEK_MILLIS) {
-        const data = (await axios.get(`https://api.tzkt.io/v1/accounts/${address}/metadata`)).data;
+        const data = (await axios.get<any>(`https://api.tzkt.io/v1/accounts/${address}/metadata`)).data;
         if (data !== '' && data.error === undefined) {
             const options = { upsert: true };
             const updateDoc = {
