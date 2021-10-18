@@ -8,5 +8,5 @@ Built with [Conseil API](https://github.com/Cryptonomic/Conseil) and [TzKT API](
 
 ## Documentation
 
-- [Mainnet](https://akaswap.com/api/doc) (previous version of api)
+- [Mainnet](https://akaswap.com/api/doc)
 - [Testnets](https://testnets.akaswap.com/api/doc)
